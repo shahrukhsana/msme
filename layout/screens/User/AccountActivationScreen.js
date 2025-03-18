@@ -1,9 +1,9 @@
-import React, {useState} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  Image,
+  RefreshControl,
   TextInput,
   TouchableOpacity,
   ScrollView,
@@ -17,30 +17,95 @@ import PageHeader from '../../navBar/pageHeader';
 import LinearGradient from 'react-native-linear-gradient';
 import GradientStyles from '../../StyleSheet/GradientStyles';
 
-export function AccountActivationScreen({ navigation }){
+import PackagePicker from '../../component/PackagePicker';
+import { postData, apiUrl } from '../../component/api';
+const urls=apiUrl();
+
+export function AccountActivationScreen({ navigation, extraData=[] }){
 
 
-  const [selectedCountry, setSelectedCountry] = useState("Select Country");
+  const [selectedPackage, setSelectedPackage] = useState("Select Package");
+  const [data, setData] = useState([]);
+  const [sponser_id, setsponser_id] = useState('');
+  const [sponser_name, setsponser_name] = useState('');
+  const [sponser, setSponser] = useState('');
 
   const handleValueChange = (itemValue) => {
-    setSelectedCountry(itemValue);
+    setSelectedPackage(itemValue);
+  };
+
+  const fetchData = async () => {
+    try {
+      const response = await postData({}, urls.walletList, "GET", navigation, extraData);
+      if(response.status==200)
+      {
+        const data = response.data; 
+        setData(data)
+      } 
+    } catch (error) {
+      console.error("API call failed:", error);
+    }
   };
 
 
+  const fetchSponserDetail = async (sponser_id) => {
+    try {
+      setSponser([])
+      setsponser_id()
+      if(!sponser_id) return false;
+      const response = await postData({"sponser_id":sponser_id}, urls.checkSponser, "POST", navigation, extraData);
+      if(response.status==200)
+      {
+        const data = response.data; 
+        setSponser(data)
+        setsponser_id(sponser_id)
+      }
+      else{
+        setSponser([])
+      }
+    } catch (error) {
+      console.error("API call failed:", error);
+    }
+  };
+  const handleSubmit = async () => {
+    try {
+      const response = await postData({"member_id":sponser_id,"package":selectedPackage}, urls.accountActivation, "POST", navigation, extraData);
+      if(response.status==200)
+      {
+        const data = response.data; 
+        setSponser([])
+        navigation.navigate("Home")
+      }
+    } catch (error) {
+      console.error("API call failed:", error);
+    }
+  };
+
+
+
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setRefreshing(false);
+    fetchData();
+  }, []);
+  useEffect(() => {
+    fetchData(); 
+  }, []); 
 
 
   return (
     <View flex={1}>
       <PageHeader pageTitle="Account Activation" navigation={navigation} />
-      <ScrollView style={theme.themeBg}>
+      <ScrollView style={theme.themeBg} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
 
         <View style={styles.header}>
             <View style={styles.headerInfo}>
                 <View style={theme.alertBox}>
                     <Icon name="inr" size={24} color="#FFA500" />
-                    <Text style={theme.alertText}>12,000.00</Text>
+                    <Text style={theme.alertText}>{data.commision_wallet}</Text>
                 </View>
-            </View>
+            </View> 
         </View>
         {/* Action Buttons */}
         
@@ -56,6 +121,8 @@ export function AccountActivationScreen({ navigation }){
                   style={theme.input}
                   placeholder="Member ID."
                   placeholderTextColor="#999"
+                  onChangeText={ (text) => fetchSponserDetail(text)}
+                  keyboardType='numeric'
                 />
               </View>
             </View>
@@ -68,6 +135,8 @@ export function AccountActivationScreen({ navigation }){
                   style={theme.input}
                   placeholder="Member Name"
                   placeholderTextColor="#999"
+                  value={sponser?.name}
+                  keyboardType='default'
                 />
               </View>
             </View>
@@ -76,19 +145,7 @@ export function AccountActivationScreen({ navigation }){
            
 
             <View style={[theme.col12]}>
-              <View style={theme.inputContainer}>
-              <Icon name="globe" size={20} style={theme.inputIcon} />
-              <Picker
-                selectedValue={selectedCountry}
-                onValueChange={handleValueChange}
-                style={theme.picker}
-              >
-                <Picker.Item label="Select Package" value="" />
-                <Picker.Item label="India" value="India" />
-                <Picker.Item label="Mexico" value="Mexico" />
-                <Picker.Item label="Australia" value="Australia" />
-              </Picker>
-              </View>
+              <PackagePicker style={[theme.inputContainer]} selectedPackage={selectedPackage} setSelectedPackage={setSelectedPackage} extraData={extraData} />              
             </View>
 
      
@@ -104,7 +161,7 @@ export function AccountActivationScreen({ navigation }){
             colors={GradientStyles.auth.colors}
             style={theme.authbutton}
           >
-            <TouchableOpacity style={theme.button} onPress={() => navigation.navigate('Home')}>
+            <TouchableOpacity style={theme.button} onPress={handleSubmit}>
               <Text style={theme.authbuttonText}>Submit</Text>
             </TouchableOpacity>
           </LinearGradient>

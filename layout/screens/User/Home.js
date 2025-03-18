@@ -7,6 +7,8 @@ import {
   Image,
   TouchableOpacity,
   RefreshControl,
+  Clipboard,
+  Alert
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
@@ -16,22 +18,74 @@ import theme from '../../StyleSheet/theme';
 import LinearGradient from 'react-native-linear-gradient';
 import GradientStyles from '../../StyleSheet/GradientStyles';
 
+import { postData, apiUrl } from '../../component/api';
+import { ScrollView } from 'react-native-gesture-handler';
+const urls=apiUrl();
+
 export function HomeScreen({ navigation, extraData = [] }) {
 
 
   const [refreshing, setRefreshing] = useState(false);
 
 
+  const [data, setData] = useState([]);
+  const [user, setUser] = useState([]);
+  const [incomes, setIncomes] = useState([]);
+  const [rankList, setRankList] = useState([]);
+
+
+  useEffect(() => {
+    fetchData(); 
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const response = await postData({}, urls.homeDetail, "GET", navigation, extraData);
+      if(response.status==200)
+      {
+        const data = response.data;
+        setData(data)
+        setUser(data.user)
+        setIncomes(data.incomes)
+        setRankList(data.rankList)
+      } 
+    } catch (error) {
+      console.error("API call failed:", error);
+    }
+  };
+
+
+  const handleSubmit = async () => {
+    const filedata = {
+      "name":name,
+      "email":email,
+      "mobile":mobile,      
+    };
+    const response = await postData(filedata, "update-profile","POST", navigation,extraData);
+  };
+  const copyLeftJoinLink = () => {
+    Clipboard.setString(data.leftJoinLink);
+    Alert.alert("Copied!", "Copied");
+  };
+  const copyRightJoinLink = () => {
+    Clipboard.setString(data.rightJoinLink);
+    Alert.alert("Copied!", "Copied.");
+  };
+
+
+
+
   const onRefresh = useCallback(() => {
     // setPage(0);
     setRefreshing(true);
     setRefreshing(false);
-    // fetchPosts(page);
+    fetchData();
   }, []);
 
-  return (
 
+  return (
     <View style={styles.container}>
+      
 
       <FlatList
         ListHeaderComponent={
@@ -39,305 +93,205 @@ export function HomeScreen({ navigation, extraData = [] }) {
 
             <Header extraData={extraData} />
 
-            <View style={[theme.container]}>
+            <View style={[theme.container]}> 
+              
+              
 
-
-              <View style={[theme.alertBox, theme.mt20]}>
-                <Icon name="exclamation-circle" size={24} color="#FFA500" />
-                <View style={theme.alerttextContainer}>
-                  <Text style={theme.alertText}>Your id not active yet.</Text>
-                  {/* <Text style={theme.alertsubText}>Your profile is incomplete.</Text> */}
-                </View>
-                <TouchableOpacity style={theme.alertbutton}>
-                  <Text style={theme.alertbuttonText}>Make Payment</Text>
-                </TouchableOpacity>
-              </View>
-
-
-              <View style={[theme.card, styles.cardBg]}>
-                <View style={[theme.cardBody]}>
-                  <View style={theme.cardImage}>
-                    <Image
-                      source={require('../../assets/user.jpg')}
-                      style={theme.profileImage}
-                    />
-                  </View>
-                  <Text style={[styles.name, theme.mt10]}>ID:- 6</Text>
-                  <Text style={[styles.name]}>Shahrukh</Text>
-                  <Text style={[styles.totalIncome]}>Total Income: <Text style={[styles.totalIncomeAmount]}>₹ 500.00</Text></Text>
-                  <Text style={[styles.todayIncome]}>Today Income: <Text style={[styles.todayIncomeAmount]}>₹ 100.00</Text></Text>
-
-                  <View style={[styles.cardtable]}>
-
-                    <View style={[styles.cardtableRow]}>
-                      <Text style={[styles.cardLeftText]}>My Package</Text>
-                      <Text style={[styles.cardRightText]}>Gold</Text>
+                  <View style={styles.card}>
+                    <View style={styles.header}>
+                      <Image 
+                        source={require('../../assets/logo.png')} 
+                        style={styles.logo} 
+                      />
+                      <View style={styles.titleContainer}>
+                        <Text style={styles.jobTitle}>Quality Assurance (QA) Engineer</Text>
+                        <Text style={styles.company}>Bakeron</Text>
+                        <View style={styles.ratingContainer}>
+                          <Icon name="star" size={14} color="#FFA500" />
+                          <Text style={styles.rating}> 4.5 Review</Text>
+                        </View>
+                      </View>
+                      <Icon name="map" size={24} color="gray" />
                     </View>
 
-                    <View style={[styles.cardtableRow]}>
-                      <Text style={[styles.cardLeftText]}>Rank</Text>
-                      <Text style={[styles.cardRightText]}>Not Upgrade</Text>
+                    <View style={styles.tagsContainer}>
+                      <Text style={styles.tag}>Remote</Text>
+                      <Text style={styles.tag}>Full-Time</Text>
+                      <Text style={styles.tag}>Executive</Text>
                     </View>
 
-                    <View style={[styles.cardtableRow]}>
-                      <Text style={[styles.cardLeftText]}>My Team</Text>
-                      <Text style={[styles.cardRightText]}>500 Members</Text>
-                    </View>
-
-                    <View style={[styles.cardtableRow]}>
-                      <Text style={[styles.cardLeftText]}>My Direct Paid</Text>
-                      <Text style={[styles.cardRightText]}>100 Members</Text>
-                    </View>
-
-                    <View style={[styles.cardtableRow]}>
-                      <Text style={[styles.cardLeftText]}>My Direct Unpaid</Text>
-                      <Text style={[styles.cardRightText]}>100 Members</Text>
-                    </View>
-
-                    <View style={[styles.cardtableRow]}>
-                      <Text style={[styles.cardLeftText]}>My Matching</Text>
-                      <Text style={[styles.cardRightText]}>9 Pair</Text>
-                    </View>
-
-                    <View style={[styles.cardtableRow]}>
-                      <Text style={[styles.cardLeftText]}>Total BV</Text>
-                      <Text style={[styles.cardRightText]}>9</Text>
-                    </View>
-
-                    <View style={[styles.cardtableRow]}>
-                      <Text style={[styles.cardLeftText]}>Left Paid</Text>
-                      <Text style={[styles.cardRightText]}>100 Members</Text>
-                    </View>
-
-                    <View style={[styles.cardtableRow]}>
-                      <Text style={[styles.cardLeftText]}>Left Unpaid</Text>
-                      <Text style={[styles.cardRightText]}>100 Members</Text>
-                    </View>
-
-                    <View style={[styles.cardtableRow]}>
-                      <Text style={[styles.cardLeftText]}>Right Paid</Text>
-                      <Text style={[styles.cardRightText]}>100 Members</Text>
-                    </View>
-
-                    <View style={[styles.cardtableRow]}>
-                      <Text style={[styles.cardLeftText]}>Right Unpaid</Text>
-                      <Text style={[styles.cardRightText]}>100 Members</Text>
-                    </View>
-
-                    <View style={[styles.cardtableRow]}>
-                      <Text style={[styles.cardLeftText]}>Activation Date</Text>
-                      <Text style={[styles.cardRightText]}>25 Aug 2025</Text>
-                    </View>
-
-                  </View>
-
-                </View>
-              </View>
-
-
-              <View style={[theme.row]}>
-
-                <View style={[theme.col6, theme.plr5]}>
-                  <View style={[theme.card]} backgroundColor={'#4CAF50'}>
-                    <View style={[theme.cardBody]}>
-                      <Text style={[styles.incomeTitle]}>Direct Income</Text>
-                      <Text style={[styles.incomeCardAmount]}>₹ 0.00</Text>
-                    </View>
-                  </View>
-                </View>
-
-                <View style={[theme.col6, theme.plr5]}>
-                  <View style={[theme.card]} backgroundColor={'#2E7D32'}>
-                    <View style={[theme.cardBody]}>
-                      <Text style={[styles.incomeTitle]}>Pair Income</Text>
-                      <Text style={[styles.incomeCardAmount]}>₹ 0.00</Text>
-                    </View>
-                  </View>
-                </View>
-
-                <View style={[theme.col6, theme.plr5]}>
-                  <View style={[theme.card]} backgroundColor={'#FFC107'}>
-                    <View style={[theme.cardBody]}>
-                      <Text style={[styles.incomeTitle]}>Downline Income</Text>
-                      <Text style={[styles.incomeCardAmount]}>₹ 0.00</Text>
-                    </View>
-                  </View>
-                </View>
-
-                <View style={[theme.col6, theme.plr5]}>
-                  <View style={[theme.card]} backgroundColor={'#FFD700'}>
-                    <View style={[theme.cardBody]}>
-                      <Text style={[styles.incomeTitle]}>Upline Income</Text>
-                      <Text style={[styles.incomeCardAmount]}>₹ 0.00</Text>
-                    </View>
-                  </View>
-                </View>
-
-                <View style={[theme.col6, theme.plr5]}>
-                  <View style={[theme.card]} backgroundColor={'#4CAF50'}>
-                    <View style={[theme.cardBody]}>
-                      <Text style={[styles.incomeTitle]}>Rank Bonus Income</Text>
-                      <Text style={[styles.incomeCardAmount]}>₹ 0.00</Text>
-                    </View>
-                  </View>
-                </View>
-
-              </View>
-
-
-
-
-
-
-              <View style={[theme.card, styles.cardBg]}>
-                <View style={[theme.cardHeader]} backgroundColor={'green'}>
-                  <Text style={[theme.cardHeaderText]}>Left Joining Link</Text>
-                </View>
-                <View style={[theme.cardBody]}>
-                  <View style={[theme.row]}>
-                    <View style={[theme.col12]}>
-                      <Text>https://developershahrukh.in/demo/irshad/shivveda/registration?sponser_id=6&side=left</Text>
-                    </View>
-                    <View style={[theme.col12]}>
-                      <LinearGradient
-                        colors={GradientStyles.auth.colors}
-                        style={theme.authbutton}
-                      >
-                        <TouchableOpacity style={theme.button} onPress={() => navigation.navigate('Home')}>
-                          <Text style={theme.authbuttonText}>Copy</Text>
-                        </TouchableOpacity>
-                      </LinearGradient>
-                    </View>
-                  </View>
-                </View>
-              </View>
-
-
-
-              <View style={[theme.card, styles.cardBg]}>
-                <View style={[theme.cardHeader]} backgroundColor={'green'}>
-                  <Text style={[theme.cardHeaderText]}>Right Joining Link</Text>
-                </View>
-                <View style={[theme.cardBody]}>
-                  <View style={[theme.row]}>
-                    <View style={[theme.col12]}>
-                      <Text>https://developershahrukh.in/demo/irshad/shivveda/registration?sponser_id=6&side=right</Text>
-                    </View>
-                    <View style={[theme.col12]}>
-                      <LinearGradient
-                        colors={GradientStyles.auth.colors}
-                        style={theme.authbutton}
-                      >
-                        <TouchableOpacity style={theme.button} onPress={() => navigation.navigate('Home')}>
-                          <Text style={theme.authbuttonText}>Copy</Text>
-                        </TouchableOpacity>
-                      </LinearGradient>
-                    </View>
-                  </View>
-                </View>
-              </View>
-
-
-
-              <View style={[theme.card, styles.cardBg]}>
-                <View style={[theme.cardHeader]} backgroundColor={'green'}>
-                  <Text style={[theme.cardHeaderText]}>Rank List</Text>
-                </View>
-                <View style={[theme.cardBody]}>
-
-                  <View style={[theme.row, styles.rankCard]}>
-                    <View style={[theme.col12]}>
-                      <Text style={[styles.rankTitle]}>Sr. Executive</Text>
-                      <Text style={[styles.rankTarget]}>2 ID : 1 ID</Text>
-                      <Text style={[styles.rankPrice]}>500/-</Text>
-                      <Text style={[styles.rankStatusSuccess]}>Completeed</Text>
-                      <Text style={[styles.rankStatusDanger]}>Pending...</Text>
-                    </View>
-                  </View>
-
-                  <View style={[theme.row, styles.rankCard]}>
-                    <View style={[theme.col12]}>
-                      <Text style={[styles.rankTitle]}>Sr. Executive</Text>
-                      <Text style={[styles.rankTarget]}>2 ID : 1 ID</Text>
-                      <Text style={[styles.rankPrice]}>500/-</Text>
-                      <Text style={[styles.rankStatusSuccess]}>Completeed</Text>
-                      <Text style={[styles.rankStatusDanger]}>Pending...</Text>
-                    </View>
-                  </View>
-
-                  <View style={[theme.row, styles.rankCard]}>
-                    <View style={[theme.col12]}>
-                      <Text style={[styles.rankTitle]}>Sr. Executive</Text>
-                      <Text style={[styles.rankTarget]}>2 ID : 1 ID</Text>
-                      <Text style={[styles.rankPrice]}>500/-</Text>
-                      <Text style={[styles.rankStatusSuccess]}>Completeed</Text>
-                      <Text style={[styles.rankStatusDanger]}>Pending...</Text>
-                    </View>
-                  </View>
-
-                  <View style={[theme.row, styles.rankCard]}>
-                    <View style={[theme.col12]}>
-                      <Text style={[styles.rankTitle]}>Sr. Executive</Text>
-                      <Text style={[styles.rankTarget]}>2 ID : 1 ID</Text>
-                      <Text style={[styles.rankPrice]}>500/-</Text>
-                      <Text style={[styles.rankStatusSuccess]}>Completeed</Text>
-                      <Text style={[styles.rankStatusDanger]}>Pending...</Text>
-                    </View>
-                  </View>
-
-                  <View style={[theme.row, styles.rankCard]}>
-                    <View style={[theme.col12]}>
-                      <Text style={[styles.rankTitle]}>Sr. Executive</Text>
-                      <Text style={[styles.rankTarget]}>2 ID : 1 ID</Text>
-                      <Text style={[styles.rankPrice]}>500/-</Text>
-                      <Text style={[styles.rankStatusSuccess]}>Completeed</Text>
-                      <Text style={[styles.rankStatusDanger]}>Pending...</Text>
-                    </View>
-                  </View>
-
-                  <View style={[theme.row, styles.rankCard]}>
-                    <View style={[theme.col12]}>
-                      <Text style={[styles.rankTitle]}>Sr. Executive</Text>
-                      <Text style={[styles.rankTarget]}>2 ID : 1 ID</Text>
-                      <Text style={[styles.rankPrice]}>500/-</Text>
-                      <Text style={[styles.rankStatusSuccess]}>Completeed</Text>
-                      <Text style={[styles.rankStatusDanger]}>Pending...</Text>
+                    <View style={styles.footer}>
+                      <View style={styles.locationContainer}>
+                        <Icon name="map-marker" size={16} color="#3182CE" />
+                        <Text style={styles.location}>Noida, India</Text>
+                      </View>
+                      <Text style={styles.date}>5 Days ago</Text>
                     </View>
                   </View>
 
 
 
-                </View>
-              </View>
+                  <View style={styles.card}>
+                    <View style={styles.header}>
+                      <Image 
+                        source={require('../../assets/logo.png')} 
+                        style={styles.logo} 
+                      />
+                      <View style={styles.titleContainer}>
+                        <Text style={styles.jobTitle}>Quality Assurance (QA) Engineer</Text>
+                        <Text style={styles.company}>Bakeron</Text>
+                        <View style={styles.ratingContainer}>
+                          <Icon name="star" size={14} color="#FFA500" />
+                          <Text style={styles.rating}> 4.5 Review</Text>
+                        </View>
+                      </View>
+                      <Icon name="map" size={24} color="gray" />
+                    </View>
+
+                    <View style={styles.tagsContainer}>
+                      <Text style={styles.tag}>Remote</Text>
+                      <Text style={styles.tag}>Full-Time</Text>
+                      <Text style={styles.tag}>Executive</Text>
+                    </View>
+
+                    <View style={styles.footer}>
+                      <View style={styles.locationContainer}>
+                        <Icon name="map-marker" size={16} color="#3182CE" />
+                        <Text style={styles.location}>Noida, India</Text>
+                      </View>
+                      <Text style={styles.date}>5 Days ago</Text>
+                    </View>
+                  </View>
+
+
+
+                  <View style={styles.card}>
+                    <View style={styles.header}>
+                      <Image 
+                        source={require('../../assets/logo.png')} 
+                        style={styles.logo} 
+                      />
+                      <View style={styles.titleContainer}>
+                        <Text style={styles.jobTitle}>Quality Assurance (QA) Engineer</Text>
+                        <Text style={styles.company}>Bakeron</Text>
+                        <View style={styles.ratingContainer}>
+                          <Icon name="star" size={14} color="#FFA500" />
+                          <Text style={styles.rating}> 4.5 Review</Text>
+                        </View>
+                      </View>
+                      <Icon name="map" size={24} color="gray" />
+                    </View>
+
+                    <View style={styles.tagsContainer}>
+                      <Text style={styles.tag}>Remote</Text>
+                      <Text style={styles.tag}>Full-Time</Text>
+                      <Text style={styles.tag}>Executive</Text>
+                    </View>
+
+                    <View style={styles.footer}>
+                      <View style={styles.locationContainer}>
+                        <Icon name="map-marker" size={16} color="#3182CE" />
+                        <Text style={styles.location}>Noida, India</Text>
+                      </View>
+                      <Text style={styles.date}>5 Days ago</Text>
+                    </View>
+                  </View>
+
+
+
+                  <View style={styles.card}>
+                    <View style={styles.header}>
+                      <Image 
+                        source={require('../../assets/logo.png')} 
+                        style={styles.logo} 
+                      />
+                      <View style={styles.titleContainer}>
+                        <Text style={styles.jobTitle}>Quality Assurance (QA) Engineer</Text>
+                        <Text style={styles.company}>Bakeron</Text>
+                        <View style={styles.ratingContainer}>
+                          <Icon name="star" size={14} color="#FFA500" />
+                          <Text style={styles.rating}> 4.5 Review</Text>
+                        </View>
+                      </View>
+                      <Icon name="map" size={24} color="gray" />
+                    </View>
+
+                    <View style={styles.tagsContainer}>
+                      <Text style={styles.tag}>Remote</Text>
+                      <Text style={styles.tag}>Full-Time</Text>
+                      <Text style={styles.tag}>Executive</Text>
+                    </View>
+
+                    <View style={styles.footer}>
+                      <View style={styles.locationContainer}>
+                        <Icon name="map-marker" size={16} color="#3182CE" />
+                        <Text style={styles.location}>Noida, India</Text>
+                      </View>
+                      <Text style={styles.date}>5 Days ago</Text>
+                    </View>
+                  </View>
+
+
+
+                  <View style={styles.card}>
+                    <View style={styles.header}>
+                      <Image 
+                        source={require('../../assets/logo.png')} 
+                        style={styles.logo} 
+                      />
+                      <View style={styles.titleContainer}>
+                        <Text style={styles.jobTitle}>Quality Assurance (QA) Engineer</Text>
+                        <Text style={styles.company}>Bakeron</Text>
+                        <View style={styles.ratingContainer}>
+                          <Icon name="star" size={14} color="#FFA500" />
+                          <Text style={styles.rating}> 4.5 Review</Text>
+                        </View>
+                      </View>
+                      <Icon name="map" size={24} color="gray" />
+                    </View>
+
+                    <View style={styles.tagsContainer}>
+                      <Text style={styles.tag}>Remote</Text>
+                      <Text style={styles.tag}>Full-Time</Text>
+                      <Text style={styles.tag}>Executive</Text>
+                    </View>
+
+                    <View style={styles.footer}>
+                      <View style={styles.locationContainer}>
+                        <Icon name="map-marker" size={16} color="#3182CE" />
+                        <Text style={styles.location}>Noida, India</Text>
+                      </View>
+                      <Text style={styles.date}>5 Days ago</Text>
+                    </View>
+                  </View>
+
+
+
+                  
+                
 
 
 
 
+              
+
+
+
+
+
+
+              
+
+
+            
 
 
 
 
             </View>
 
-
-
-
-
-            {/* Stories */}
-            {/* <FlatList
-              data={stories}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              keyExtractor={(item) => item.id}
-              renderItem={renderStory}
-              style={styles.storyList}
-            /> */}
-
-
           </>
         }
-        // data={posts}
-        // renderItem={renderPost}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
 
 
@@ -354,114 +308,80 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  cardBg: {
-    backgroundColor: '#4CAF50'
-  },
-  name: {
-    width: '100%',
-    textAlign: 'center',
-    fontSize: 25,
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
-    marginBottom: 10,
-    color: 'white',
-  },
-  totalIncome: {
-    backgroundColor: 'red',
-    paddingHorizontal: 10,
-    color: 'white',
-    borderRadius: 5,
-    paddingVertical: 5,
-    textAlign: 'center',
-    fontSize: 25,
-  },
-  todayIncome: {
-    backgroundColor: 'red',
-    paddingHorizontal: 10,
-    color: 'white',
-    borderRadius: 5,
-    paddingVertical: 5,
-    fontSize: 25,
-    marginTop: 10,
-    marginBottom: 25,
-    textAlign: 'center'
-  },
-  totalIncomeAmount: {
-    fontSize: 30,
-    fontWeight: 'bold'
-  },
-  todayIncomeAmount: {
-    fontSize: 30,
-    fontWeight: 'bold'
-  },
-  cardtableRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginVertical: 5
-  },
-  cardLeftText: {
-    width: '50%',
-    fontSize: 15,
-    fontWeight: 'bold',
-    color: '#5D4037'
-  },
-  cardRightText: {
-    width: '50%',
-    fontSize: 15,
-    fontWeight: 'bold',
-    textAlign: 'right',
-    color: '#FFFFFF'
-  },
-  incomeTitle: {
-    fontSize: 15,
-    fontWeight: 'bold',
-    marginBottom: 5,
-    color: '#FFFFFF'
-  },
-  incomeCardAmount: {
-    fontSize: 25,
-    fontWeight: 'bold',
-    color: '#FFFFFF'
-  },
-  rankCard: {
-    backgroundColor: 'white',
+
+
+  card: {
+    backgroundColor: '#fff',
+    padding: 15,
     borderRadius: 10,
-    padding: 10,
-    marginTop: 10
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 10,
+    marginVertical: 10,
   },
-  rankTitle: {
-    textAlign: 'center',
-    fontSize: 20
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
   },
-  rankTarget: {
-    textAlign: 'center',
-    fontSize: 20
+  logo: {
+    width: 40,
+    height: 40,
+    borderRadius: 5,
+    marginRight: 10,
   },
-  rankPrice: {
-    textAlign: 'center',
-    fontSize: 30,
-    fontWeight: '900'
+  titleContainer: {
+    flex: 1,
   },
-  rankStatusSuccess: {
-    textAlign: 'center',
-    fontSize: 15,
-    fontWeight: '900',
-    backgroundColor: 'green',
-    color: 'white',
-    padding: 5,
-    marginTop: 10
+  jobTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
-  rankStatusDanger: {
-    textAlign: 'center',
-    fontSize: 15,
-    fontWeight: '900',
-    backgroundColor: 'red',
-    color: 'white',
-    padding: 5,
-    marginTop: 10
+  company: {
+    color: '#3182CE',
+    fontSize: 14,
   },
-
-
+  ratingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  rating: {
+    fontSize: 14,
+    color: '#666',
+  },
+  tagsContainer: {
+    flexDirection: 'row',
+    marginVertical: 8,
+  },
+  tag: {
+    backgroundColor: '#E2E8F0',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+    marginRight: 8,
+    fontSize: 12,
+    color: '#333',
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  locationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  location: {
+    color: '#3182CE',
+    fontSize: 14,
+    marginLeft: 4,
+  },
+  date: {
+    fontSize: 14,
+    color: '#666',
+  },
 
 
 

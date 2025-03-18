@@ -14,20 +14,54 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 import theme from '../../StyleSheet/theme';
 import GradientStyles from '../../StyleSheet/GradientStyles';
+import CountryPicker from '../../component/CountryPicker';
+import PlacementPicker from '../../component/PlacementPicker';
+import StatePicker from '../../component/StatePicker';
 
-export function SignUpScreen({ navigation }) {
+import { postData, apiUrl } from '../../component/api';
+const urls=apiUrl();
 
 
-  const [selectedCountry, setSelectedCountry] = useState("Select Country");
+export function SignUpScreen({ navigation, extraData=[] }) {
 
-  const handleValueChange = (itemValue) => {
-    setSelectedCountry(itemValue);
+
+  const [selectedCountry, setSelectedCountry] = useState();
+  const [selectedState, setSelectedState] = useState();
+  const [sponser_id, setsponser_id] = useState();
+  const [sponser_name, setsponser_name] = useState();
+  const [selectedPlacement, setSelectedPlacement] = useState();
+  const [name, setname] = useState();
+  const [email, setemail] = useState();
+  const [phone, setphone] = useState();
+  const [address, setaddress] = useState();
+  const [city, setcity] = useState();
+  const [password, setpassword] = useState();
+  const [cpassword, setcpassword] = useState();
+  
+
+
+  const handleSubmit = async () => {
+    const filedata = {
+        "sponser_id":sponser_id,
+        "placement":selectedPlacement,
+        "name":name,
+        "email":email,
+        "phone":phone,
+        "password":password,
+        "cpassword":cpassword
+    };
+    const response = await postData(filedata, urls.registerOtpSend,"POST", navigation,extraData);
+    if(response.status==200)
+    {
+      navigation.navigate('RegisterOtp',{"id":response.data.id});
+    }
+
   };
-
+ 
 
   return (
     <View style={theme.authBackground} >
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
       <View style={theme.authcontainer}>
 
         <Image source={require('../../assets/logo.png')}  />
@@ -36,143 +70,62 @@ export function SignUpScreen({ navigation }) {
 
         <View style={[theme.row]}>
           
+
+
+            <View style={[theme.col12]}>
+              <Text style={[theme.inputLabel]}>Name<Text style={{color:'red'}}> *</Text></Text>
+              <View style={theme.authinputContainer}>
+                <Icon name="user" size={20} style={theme.authinputIcon} />
+                <TextInput
+                  style={theme.authinput}
+                  />
+              </View>
+            </View>
+
+            <View style={[theme.col12]}>
+              <Text style={[theme.inputLabel]}>Email<Text style={{color:'red'}}> *</Text></Text>
+              <View style={theme.authinputContainer}>
+                <Icon name="user" size={20} style={theme.authinputIcon} />
+                <TextInput
+                  style={theme.authinput}
+                  />
+              </View>
+            </View>
+
+            <View style={[theme.col12]}>
+              <Text style={[theme.inputLabel]}>Phone<Text style={{color:'red'}}> *</Text></Text>
+              <View style={theme.authinputContainer}>
+                <Icon name="user" size={20} style={theme.authinputIcon} />
+                <TextInput 
+                  style={theme.authinput}
+                  />
+              </View>
+            </View>
+
+            <View style={[theme.col12]}>
+              <Text style={[theme.inputLabel]}>Password<Text style={{color:'red'}}> *</Text></Text>
+              <View style={theme.authinputContainer}>
+                <Icon name="lock" size={20} style={theme.authinputIcon} />
+                <TextInput
+                  style={theme.authinput}
+                  secureTextEntry
+                  />
+              </View>
+            </View>
+
+            <View style={[theme.col12]}>
+              <Text style={[theme.inputLabel]}>Confirm Password<Text style={{color:'red'}}> *</Text></Text>
+              <View style={theme.authinputContainer}>
+                <Icon name="lock" size={20} style={theme.authinputIcon} />
+                <TextInput
+                  style={theme.authinput}
+                  secureTextEntry
+                  />
+              </View>
+            </View>
+
+
           
-          <View style={[theme.col6]}>
-            <View style={theme.inputContainer}>
-              <Icon name="star" size={20} style={theme.inputIcon} />
-              <TextInput
-                style={theme.input}
-                placeholder="Sponser ID."
-                placeholderTextColor="#999"
-              />
-            </View>
-          </View>
-
-
-          <View style={[theme.col6]}>
-            <View style={theme.inputContainer}>
-              <Icon name="star" size={20} style={theme.inputIcon} />
-              <TextInput
-                style={theme.input}
-                placeholder="Sponser Name"
-                placeholderTextColor="#999"
-              />
-            </View>
-          </View>
-
-
-          
-          <View style={[theme.col6]}>
-            <View style={theme.inputContainer}>
-              <Icon name="user" size={20} style={theme.inputIcon} />
-              <TextInput
-                style={theme.input}
-                placeholder="Name"
-                placeholderTextColor="#999"
-              />
-            </View>
-          </View>
-
-          <View style={[theme.col6]}>
-            <View style={theme.inputContainer}>
-              <Icon name="envelope" size={20} style={theme.inputIcon} />
-              <TextInput
-                style={theme.input}
-                placeholder="Email"
-                placeholderTextColor="#999"
-              />
-            </View>
-          </View>
-
-          <View style={[theme.col6]}>
-
-            <View style={theme.inputContainer}>
-
-            <Icon name="globe" size={20} style={theme.inputIcon} />
-            <Picker
-              selectedValue={selectedCountry}
-              onValueChange={handleValueChange}
-              style={theme.picker}
-            >
-              <Picker.Item label="Select Country" value="Select Country" />
-              <Picker.Item label="India" value="India" />
-              <Picker.Item label="Mexico" value="Mexico" />
-              <Picker.Item label="Australia" value="Australia" />
-            </Picker>
-            {/* <Text style={theme.selectedText}>Selected Country: {selectedCountry}</Text> */}
-
-
-              
-            </View>
-          </View>
-
-          <View style={[theme.col6]}>
-            <View style={theme.inputContainer}>
-              <Icon name="phone" size={20} style={theme.inputIcon} />
-              <TextInput
-                style={theme.input}
-                placeholder="Mobile"
-                placeholderTextColor="#999"
-              />
-            </View>
-          </View>
-
-          <View style={[theme.col6]}>
-            <View style={theme.inputContainer}>
-              <Icon name="map-marker" size={20} style={theme.inputIcon} />
-              <TextInput
-                style={theme.input}
-                placeholder="State"
-                placeholderTextColor="#999"
-              />
-            </View>
-          </View>
-
-          <View style={[theme.col6]}>
-            <View style={theme.inputContainer}>
-              <Icon name="map" size={20} style={theme.inputIcon} />
-              <TextInput
-                style={theme.input}
-                placeholder="City"
-                placeholderTextColor="#999"
-              />
-            </View>
-          </View>
-
-          <View style={[theme.col12]}>
-            <View style={theme.inputContainer}>
-              <Icon name="home" size={20} style={theme.inputIcon} />
-              <TextInput
-                style={theme.input}
-                placeholder="Address"
-                placeholderTextColor="#999"
-              />
-            </View>
-          </View>
-
-          <View style={[theme.col6]}>
-            <View style={theme.authinputContainer}>
-              <Icon name="lock" size={20} style={theme.inputIcon} />
-              <TextInput
-                style={theme.authinput}
-                placeholder="Password"
-                placeholderTextColor="#999"
-                secureTextEntry
-              />
-            </View>
-          </View>
-
-          <View style={[theme.col6]}>
-            <View style={theme.authinputContainer}>
-              <Icon name="lock" size={20} style={theme.inputIcon} />
-              <TextInput
-                style={theme.authinput}
-                placeholder="Confirm Password"
-                placeholderTextColor="#999"
-                secureTextEntry
-              />
-            </View>
-          </View>
 
 
         </View>
@@ -185,7 +138,7 @@ export function SignUpScreen({ navigation }) {
           colors={GradientStyles.auth.colors}
           style={theme.authbutton}
         >
-          <TouchableOpacity style={theme.button} onPress={() => navigation.navigate('Otp')}>
+          <TouchableOpacity style={theme.button} onPress={handleSubmit}>
             <Text style={theme.authbuttonText}>Create Account</Text>
           </TouchableOpacity>
         </LinearGradient>

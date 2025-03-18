@@ -16,17 +16,64 @@ import PageHeader from '../../navBar/pageHeader';
 import LinearGradient from 'react-native-linear-gradient';
 import GradientStyles from '../../StyleSheet/GradientStyles';
 
+import { postData, apiUrl } from '../../component/api';
+const urls=apiUrl();
+
 export function DepositListScreen({ navigation, extraData=[] }){
 
+    const [amount, setamount] = useState(0);
+    const [min_deposit, setmin_deposit] = useState(0);
+    
+    
+    
+    
+    
+    
+    const handleSubmit = async () => {
+        try {
+            const response = await postData({"amount":amount}, urls.depositAdd, "POST", navigation, extraData);
+            if(response.status==200)
+                {
+                    const data = response.data; 
+                    setamount(0)
+                    navigation.navigate("DepositPay",{"data":data})
+                }
+            } catch (error) {
+                console.error("API call failed:", error);
+            }
+        };
+        
+        
+    const [data, setData] = useState([]);
+    const [page, setPage] = useState(0);
     const [refreshing, setRefreshing] = useState(false);
-
-
+    const fetchData = async (pagep) => {
+        try {
+          const response = await postData({"page":pagep}, urls.depositList, "POST", navigation, extraData);
+          if(response.status==200)
+          {
+            const data = response.data; 
+            setData(prevData => pagep === 0 ? data : [...prevData, ...data]);
+            setmin_deposit(response.min_deposit)
+          } 
+        } catch (error) {
+          console.error("API call failed:", error);
+        }
+    };
     const onRefresh = useCallback(() => {
-      // setPage(0);
+      setPage(0);
       setRefreshing(true);
       setRefreshing(false);
-      // fetchPosts(page);
+      fetchData(page)
     }, []);
+    useEffect(() => {
+        fetchData(page);
+    }, []);
+    const handleLoadMore = () => {
+        const nextPage = page + 1;
+        setPage(nextPage);
+        fetchData(nextPage);              
+    };
 
 
 
@@ -36,7 +83,7 @@ export function DepositListScreen({ navigation, extraData=[] }){
         <FlatList
             ListHeaderComponent={
             <>
-                <PageHeader pageTitle="Deposit (Min Amount 200)" navigation={navigation} />
+                <PageHeader pageTitle={`Deposit (Min Amount ${min_deposit})`} navigation={navigation} />
                 <View style={[theme.themeBg]}>
                     <View style={[theme.card]}>
                         <View style={[theme.cardBody]}>
@@ -47,6 +94,9 @@ export function DepositListScreen({ navigation, extraData=[] }){
                                     style={theme.input}
                                     placeholder="Amount"
                                     placeholderTextColor="#999"
+                                    value={amount}
+                                    onChangeText={setamount}
+                                    keyboardType='decimal-pad'
                                     />
                                 </View>
                             </View>
@@ -55,7 +105,7 @@ export function DepositListScreen({ navigation, extraData=[] }){
                                 colors={GradientStyles.auth.colors}
                                 style={theme.authbutton}
                             >
-                                <TouchableOpacity style={theme.button} onPress={() => navigation.navigate('DepositPay')}>
+                                <TouchableOpacity style={theme.button} onPress={handleSubmit}>
                                 <Text style={theme.authbuttonText}>Submit</Text>
                                 </TouchableOpacity>
                             </LinearGradient>
@@ -63,22 +113,38 @@ export function DepositListScreen({ navigation, extraData=[] }){
                         </View>
                     </View>
                     
+                    <FlatList
+                        data={data} // Array of items
+                        keyExtractor={(item) => item.id} // Unique key for each item
+                        renderItem={({ item }) => ( // Function to render each item
+                            <View style={[theme.cardRow, theme.row]}>
+                                <View style={[theme.col2]}><Icon name="inr" style={[styles.roundCircule]} /></View>
+                                <View style={[theme.col7]}>
+                                    <Text style={[theme.cardRowTitle]}>#{item.request_id}</Text>
+                                    <Text style={[styles.paymentMode]}>{item.payment_mode}</Text>
+                                    <Text style={[styles.txrDate]}>{item.add_date_time}</Text>
+                                    {
+                                        item.status==0?
+                                            <Text style={[theme.statusInfo]}>{item.statusText}</Text>
+                                        :item.status==1?
+                                            <Text style={[theme.statusSuccess]}>{item.statusText}</Text>
+                                        :item.status==2?
+                                            <Text style={[theme.statusDanger]}>{item.statusText}</Text>
+                                        :null
+                                    }
+                                </View>
+                                <View style={[theme.col3]}><Text style={[styles.amount]}>{item.amount}</Text></View>
+                            </View>                 
+                            )}
+                        />
 
-
-                    <View style={[theme.cardRow, theme.row]}>
-                        <View style={[theme.col2]}><Icon name="inr" style={[styles.roundCircule]} /></View>
-                        <View style={[theme.col7]}>
-                            <Text style={[theme.cardRowTitle]}>165465465</Text>
-                            <Text style={[styles.paymentMode]}>Mode</Text>
-                            <Text style={[styles.txrDate]}>09 Jun, 2025</Text>
-                            <Text style={[theme.statusSuccess]}>Accepted</Text>
-                        </View>
-                        <View style={[theme.col3]}><Text style={[styles.amount]}>100.00</Text></View>
-                    </View>
+                    
 
                 </View>
             </>
             }
+            onEndReached={handleLoadMore}
+            onEndReachedThreshold={0.5}
             refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         />
       

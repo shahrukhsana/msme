@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
   
   navContainer: {
     flexDirection: 'row',
-    backgroundColor: '#00a954',
+    backgroundColor: 'white',
     paddingVertical: 10,
     borderTopWidth: 1,
     borderColor: '#ddd',
@@ -53,11 +53,11 @@ const styles = StyleSheet.create({
   },
   navText: {
     fontSize: 12,
-    color: 'white',
+    color: '#1695cc',
     fontWeight:'bold'
   },
   footerIcon:{
-      color:'white'
+      color:'#1695cc'
   },
 });
 

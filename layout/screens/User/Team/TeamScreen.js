@@ -9,7 +9,9 @@ import { DirectTeamScreen } from './DirectTeamScreen';
 
 const Tab = createMaterialTopTabNavigator();
 
-export function TeamScreen({ navigation }) {
+export function TeamScreen({ navigation, extraData=[] }) {
+
+
   return (
     <View style={{ flex: 1 }}>
       <PageHeader pageTitle="Team" navigation={navigation} />
@@ -20,10 +22,10 @@ export function TeamScreen({ navigation }) {
           tabBarIndicatorStyle: styles.tabIndicator,
         }}
       >
-        <Tab.Screen name="Tree" component={TreeScreen} />
-        <Tab.Screen name="Direct Team" component={DirectTeamScreen} />
-        <Tab.Screen name="Left Team" component={LeftTeamScreen} />
-        <Tab.Screen name="Right Team" component={RightTeamScreen} />
+        <Tab.Screen name="Tree" component={TreeScreen} initialParams={{ extraData }} />
+        <Tab.Screen name="Direct Team" component={DirectTeamScreen} initialParams={{ extraData }} />
+        <Tab.Screen name="Left Team" component={LeftTeamScreen} initialParams={{ extraData }} />
+        <Tab.Screen name="Right Team" component={RightTeamScreen} initialParams={{ extraData }} />
       </Tab.Navigator>
     </View>
   );

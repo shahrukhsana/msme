@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -11,24 +11,23 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
-import {postData} from '../component/api'; 
 import theme from "../StyleSheet/theme";
 
+import {postData, apiUrl} from '../component/api'; 
+const urls=apiUrl();
 
+import { MMKV } from 'react-native-mmkv';
+const storage = new MMKV();
 
+const SideBar = ({navigation, extraData=[] }) => {
 
-
-const SideBar = ({navigation, extraData }) => {
-
-
+  const [userDetail, setuserDetail] = useState(JSON.parse(storage.getString('user')));
   const setSideBar = extraData.sidebar.setSideBar;
   const showSideBar = extraData.sidebar.showSideBar;
 
     const handleLogout = async () => {
-      navigation.navigate("Login")
-        // filedata = {};
-        // const response = await postData(filedata, "logout","GET", navigation,extraData);
-        // console.log(response)
+      var filedata = {};
+      const response = await postData(filedata, urls.logout,"GET", navigation,extraData);
       };
 
   const translateX = useRef(new Animated.Value(-250)).current; // Sidebar position
@@ -92,8 +91,8 @@ const SideBar = ({navigation, extraData }) => {
           <View style={styles.profileSection}>
             <Image source={require("../assets/user.jpg")} style={styles.profileImage} />
             <View style={styles.profileDetails}>
-              <Text style={styles.profileName}>John Doe</Text>
-              <Text style={styles.profileID}>6</Text>
+              <Text style={styles.profileName}>{userDetail.name}</Text>
+              <Text style={styles.profileID}>{userDetail.user_id}</Text>
             </View>
           </View>
 
@@ -191,7 +190,7 @@ const SideBar = ({navigation, extraData }) => {
               <View style={styles.menuIcon}>
                 <Icon name="call" style={[theme.sideBarIconColor]} />
               </View>
-              <Text style={styles.menuTextLabel}>Hekp & Support</Text>
+              <Text style={styles.menuTextLabel}>Help & Support</Text>
             </TouchableOpacity>
             <View style={styles.divider} />
 

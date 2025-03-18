@@ -16,7 +16,7 @@ import { postData, apiUrl } from '../../component/api';
 const urls=apiUrl();
 
 
-export function OtpScreen({ navigation, route, extraData=[] }) {
+export function RegisterOtpScreen({ navigation, route, extraData=[] }) {
 
   const id=route.params.id;
   const otpLength = 4; // Number of OTP digits
@@ -48,11 +48,11 @@ export function OtpScreen({ navigation, route, extraData=[] }) {
       "id":id,
       "otp":otp2,
     };
-    const response = await postData(filedata, urls.submitOtp,"POST", navigation,extraData);
-    if(response.status==200 && response.action!='register')
-    {
-      navigation.navigate('CreatePassword',{"user_id":response.data.user_id})
-    }
+    const response = await postData(filedata, urls.register,"POST", navigation,extraData);
+    // if(response.status==200 && response.action!='register')
+    // {
+    //   navigation.navigate('CreatePassword',{"user_id":response.data.user_id})
+    // }
   };
 
   return (

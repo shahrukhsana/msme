@@ -13,9 +13,16 @@ import theme from '../StyleSheet/theme';
 import PageHeader from '../navBar/pageHeader';
 import Footer from '../navBar/footerBar';
 
-export function SettingScreen ({ navigation }){
+import { postData, apiUrl } from '../component/api';
+const urls=apiUrl();
+
+export function SettingScreen ({ navigation, extraData=[] }){
   const [textMessages, setTextMessages] = React.useState(true);
 
+  const handleLogout = async () => {
+    var filedata = {};
+    const response = await postData(filedata, urls.logout,"GET", navigation,extraData);
+    };
   return (
     
     <View flex={1}>
@@ -49,7 +56,7 @@ export function SettingScreen ({ navigation }){
 
             
 
-                  <TouchableOpacity style={styles.optionRow} onPress={() => navigation.navigate('Login')}>
+                  <TouchableOpacity style={styles.optionRow} onPress={handleLogout}>
                     <Ionicons name={'log-out-outline'} size={30} style={theme.inputIcon} />
                     <Text style={styles.optionText}>Sign Out</Text>
                     <Ionicons name="chevron-forward" size={30} style={theme.inputIcon} />

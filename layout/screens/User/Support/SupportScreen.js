@@ -7,7 +7,7 @@ import { AllSupportScreen } from './AllSupportScreen';
 
 const Tab = createMaterialTopTabNavigator();
 
-export function SupportScreen({ navigation }) {
+export function SupportScreen({ navigation, extraData=[] }) {
   return (
     <View style={{ flex: 1 }}>
       <PageHeader pageTitle="Support" navigation={navigation} />
@@ -18,8 +18,8 @@ export function SupportScreen({ navigation }) {
           tabBarIndicatorStyle: styles.tabIndicator,
         }}
       >
-        <Tab.Screen name="All Ticket" component={AllSupportScreen} />
-        <Tab.Screen name="Add Ticket" component={AddSupportScreen} />
+        <Tab.Screen name="All Ticket" component={AllSupportScreen} initialParams={{ extraData }} />
+        <Tab.Screen name="Add Ticket" component={AddSupportScreen} initialParams={{ extraData }} />
       </Tab.Navigator>
     </View>
   );

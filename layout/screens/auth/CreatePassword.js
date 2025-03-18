@@ -1,48 +1,91 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
+import React, {useState} from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 import theme from '../../StyleSheet/theme';
 import GradientStyles from '../../StyleSheet/GradientStyles';
 
-export function CreatePasswordScreen({ navigation }) {
-  return (
-    <ImageBackground
-    // source={{ uri: 'https://i.pinimg.com/736x/cc/47/8f/cc478fc4d03ef1b3394be8cecf5482de.jpg' }}
-      style={theme.background}
-    >
-      <View style={theme.container}>
-        <Text style={theme.welcomeText}>Create Password</Text>
+import { postData, apiUrl } from '../../component/api';
+const urls=apiUrl();
 
-        <View style={theme.inputContainer}>
+export function CreatePasswordScreen({ navigation, route, extraData=[] }) {
+
+  const user_id = route.params.user_id;
+  
+  const [password, setPassword] = useState(''); 
+  const [cpassword, setCpassword] = useState(''); 
+
+   
+
+  const handleLogin = async () => {
+    // if (!username || !password) {
+    //   Alert.alert('Error', 'Please enter username and password');
+    //   return;
+    // }
+    const filedata = {
+      "username":user_id,
+      "npassword":password,
+      "cpassword":cpassword
+    };
+    const response = await postData(filedata, urls.createPassword,"POST", navigation,extraData);
+    
+
+  };
+
+
+  return (
+    <View style={theme.authBackground} >
+      <View style={theme.authcontainer}>
+
+        <Image source={require('../../assets/logo.png')}  />        
+
+        <Text style={theme.authtitle}>Create Password</Text>
+
+        <View style={theme.authinputContainer}>
+          <Icon name="lock" size={20} style={theme.authinputIcon} />
           <TextInput
-            style={theme.input}
-            placeholder="New Password"
+            style={theme.authinput}
+            placeholder="Password"
             placeholderTextColor="#999"
-            keyboardType="email-address"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
           />
         </View>
-        <View style={theme.inputContainer}>
+
+        <View style={theme.authinputContainer}>
+          <Icon name="lock" size={20} style={theme.authinputIcon} />
           <TextInput
-            style={theme.input}
+            style={theme.authinput}
             placeholder="Confirm Password"
             placeholderTextColor="#999"
-            keyboardType="email-address"
+            secureTextEntry
+            value={cpassword}
+            onChangeText={setCpassword}
           />
         </View>
 
+        
 
-        <LinearGradient 
-          style={theme.buttonGreen} 
-          colors={GradientStyles.primary.colors}
-          start={GradientStyles.primary.start}
-          end={GradientStyles.primary.end}>          
-          <TouchableOpacity style={theme.btnInner} onPress={() => navigation.navigate('Home')}>
-            <Text style={theme.buttonText}>Submit</Text>
+        <LinearGradient
+          colors={GradientStyles.auth.colors}
+          style={theme.authbutton}
+        >
+          <TouchableOpacity style={theme.button} onPress={handleLogin}>
+            <Text style={theme.authbuttonText}>Submit</Text>
           </TouchableOpacity>
         </LinearGradient>
 
+
+
       </View>
-    </ImageBackground>
+    </View>
   );
 }

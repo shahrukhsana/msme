@@ -1,16 +1,72 @@
-const apiUrl = 'https://developershahrukh.in/demo/rajkumar/face2face/api/user/';
 import {
   Alert
 } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
-// import RNFS from 'react-native-fs';
-
+import RNFS from 'react-native-fs';
 import { MMKV } from 'react-native-mmkv';
 const storage = new MMKV();
 
-export const postData = async (filedata, furl, method, navigation, extraData) => {
 
-  let url = apiUrl+furl;
+
+
+export const apiUrl = () => {
+  // const mainUrl = 'http://192.168.1.42/projects/krn/msme/api/user/';   // home
+  const mainUrl = 'http://192.168.29.11/projects/msme/api/user/';   // office
+  // const mainUrl = 'https://developershahrukh.in/demo/irshad/shivveda/api/user/';  
+  return {
+    "login":`${mainUrl}login`,
+    "registerOtpSend":`${mainUrl}register-otp-send`,
+    "register":`${mainUrl}register`,
+    "updateProfile":`${mainUrl}update-profile`,
+    "updatePassword":`${mainUrl}update-password`,
+    "getProfile":`${mainUrl}get-profile`,
+    "logout":`${mainUrl}logout`,
+    "sendOtp":`${mainUrl}send-otp`,
+    "submitOtp":`${mainUrl}submit-otp`,
+    "createPassword":`${mainUrl}create-password`,
+    
+    "country":`${mainUrl}country`,
+    "package":`${mainUrl}package`,
+    "state":`${mainUrl}state`,
+    "searchSponser":`${mainUrl}search-sponser`,
+    "checkSponser":`${mainUrl}check-sponser`,
+
+
+    "homeDetail":`${mainUrl}home-detail`,
+    "keuDetail":`${mainUrl}kyc-detail`,
+    "kycAdd":`${mainUrl}kyc-add`,
+    "walletList":`${mainUrl}wallet-list`,
+    "withdrawalList":`${mainUrl}withdrawal-list`,
+    "withdrawalAdd":`${mainUrl}withdrawal-add`,
+    "supportLsit":`${mainUrl}support-list`,
+    "supportAdd":`${mainUrl}support-add`,
+    "earningList":`${mainUrl}earning-list`,
+    "depositList":`${mainUrl}deposit-list`,
+    "depositAdd":`${mainUrl}deposit-add`,
+    "depositSubmit":`${mainUrl}deposit-submit`,
+    "teamTree":`${mainUrl}team-tree`,
+    "teamDirect":`${mainUrl}team-direct`,
+    "teamLeft":`${mainUrl}team-left`,
+    "teamRight":`${mainUrl}team-right`,    
+    "newRegister":`${mainUrl}new-register`,
+    "accountActivation":`${mainUrl}account-activation`,
+    
+    "productList":`${mainUrl}product-list`,
+
+    "cartList":`${mainUrl}cart-list`,
+    "cartAdd":`${mainUrl}cart-add`,
+
+    "kycDetail":`${mainUrl}kyc-detail`,
+
+  };
+};
+
+
+
+export const postData = async (filedata, url, method, navigation, extraData) => {
+
+  // console.log(url)
+  // return false;
   const deviceId = await DeviceInfo.getUniqueId();
   let data = '';
   if(method=='POST')  data = JSON.stringify(Object.assign(filedata, { device_id: deviceId}));
@@ -36,6 +92,7 @@ export const postData = async (filedata, furl, method, navigation, extraData) =>
     });    
     return await responseCheck(response, navigation, extraData);   
   } catch (error) {
+    extraData.loader.setShowLoader(false);
     console.error("Failed to make POST request:", error);
     return error;
   }
@@ -53,8 +110,9 @@ const responseCheck = async (response, navigation, extraData) => {
       result = response; 
     }
     console.log("Response:", result); 
-
     extraData.loader.setShowLoader(false);
+    
+
 
 
 
@@ -63,13 +121,23 @@ const responseCheck = async (response, navigation, extraData) => {
       switch (result.action) {
         case "add":
           showSuccessMessage(result.message, extraData, 1);
-          return;
+          return result;
   
         case "login":
           showSuccessMessage(result.message, extraData, 1);
-          storeLoginToken(result?.token);
+          storeLoginToken(result);
           extraData.user.setUsername('');
           extraData.user.setPassword('');
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Home' }], 
+          });
+          return;
+
+          case "tokenUpdate":
+          case "register":
+          showSuccessMessage(result.message, extraData, 1);
+          storeLoginToken(result);
           navigation.reset({
             index: 0,
             routes: [{ name: 'Home' }], 
@@ -133,12 +201,13 @@ const responseCheck = async (response, navigation, extraData) => {
 
     return result; // Return parsed JSON data
   } catch (error) {
+    extraData.loader.setShowLoader(false);
     console.error("Invalid JSON response:", error);
     return error; // Return null if JSON parsing fails
   }
 };
 
-const showSuccessMessage = (message, extraData, type) => {
+export const showSuccessMessage = (message, extraData, type) => {
   extraData.alert.setAlertMessage(message);
   extraData.alert.setShowAlert(true);
   extraData.alert.setAlertType(type);
@@ -148,9 +217,10 @@ const showErrorMessage = (message) => {
   Alert.alert("Error", message);
 };
 
-const storeLoginToken = (token) => {
+const storeLoginToken = (result) => {
   try {
-    storage.set('token',token);
+    storage.set('token',result?.token);
+    storage.set('user',JSON.stringify(result?.data));
   } catch (error) {
     console.error("Failed to save token:", error);
   }

@@ -147,13 +147,13 @@ tabButtonText:{
 inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    // backgroundColor: '#fffffff',
+    backgroundColor: '#e8f0fb',
     borderRadius: 8,
     marginVertical: 10,
     paddingHorizontal: 10,
     width: '100%',
     height: 50,
-    borderBottomWidth:1,
+    // borderWidth:1,
     borderColor:'#9E9E9E'
 }, 
 fileType: {
@@ -182,7 +182,7 @@ input: {
 },
 inputIcon: {
     marginRight: 10,
-    color:'#FFC107'
+    color:'#D0D0D0'
 },
 inputLabel:{
     // flex:1,
@@ -324,7 +324,7 @@ statusSuccess:{
 },
 
 barsIcon:{
-    color:'#2E7D32',
+    color:'#1695cc',
     fontSize:25
 },
 

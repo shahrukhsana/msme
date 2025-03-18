@@ -1,28 +1,42 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, Image } from 'react-native';
+import React, {useState} from 'react';
+import { View, Text, TouchableOpacity, Image, TextInput } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import theme from '../StyleSheet/theme';
+
+import { MMKV } from 'react-native-mmkv';
+const storage = new MMKV();
+
+
 const Header = ({extraData=[]}) => {
+  const [userDetail, setuserDetail] = useState(JSON.parse(storage.getString('user')));
   return (
     <View style={styles.header}>
       <View style={styles.container}>
-        <View style={styles.headerContent}>
-          
-          {/* Back Button */}
-          <TouchableOpacity style={styles.backButton} onPress={() => extraData.sidebar.setSideBar(true)}>
-            <Icon name="bars" size={20} style={theme.barsIcon} />
-          </TouchableOpacity>          
+        <View style={[styles.headerContent, theme.row]}>
 
-          {/* Notification Button */}
-          <TouchableOpacity style={styles.notificationButton} onPress={() => {}}>
-            <Image source={require('../assets/logo.png')} style={[theme.headerLogo]} />
-          </TouchableOpacity>
+          <View style={[theme.col2]}>
+            {/* Back Button */}
+            <TouchableOpacity style={styles.backButton} onPress={() => extraData.sidebar.setSideBar(true)}>
+              <Icon name="bars" size={20} style={theme.barsIcon} />
+            </TouchableOpacity>
+          </View>
+
+          <View style={[theme.col10]}>
+              <View style={[theme.inputContainer, styles.search]}>
+                <Icon name="search" size={20} style={[theme.inputIcon]} />
+                <TextInput 
+                  style={theme.input}
+                  placeholder='Search Keyword...'
+                  />
+              </View>            
+          </View>
+
+          
 
           {/* Title */}
-          <View style={styles.titleContainer}>
-            <Text style={styles.title}>Hi! Shahrukh</Text>
-            
-          </View>
+          {/* <View style={styles.titleContainer}>
+            <Text style={styles.title}>Hi! {userDetail.name}</Text>
+          </View> */}
 
         </View>
       </View>
@@ -41,7 +55,7 @@ const styles = {
   },
   headerContent: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'left',
     alignItems: 'center',
   },
   backButton: {
@@ -60,6 +74,16 @@ const styles = {
   navbarBorder: {
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
+  },
+  search:{
+    borderWidth:1,
+    borderRadius:5,
+    paddingHorizontal:12,
+    width: '100%',
+    borderColor: '#1695cc',
+    backgroundColor:'white',
+    marginVertical:0,
+    paddingVertical:0
   },
 };
 

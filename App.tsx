@@ -22,28 +22,7 @@ import { SettingScreen } from './layout/screens/Setting';
 
 
 import { HomeScreen } from './layout/screens/User/Home';
-import { NewRegisterScreen } from './layout/screens/User/NewRegisterScreen';
-import { AccountActivationScreen } from './layout/screens/User/AccountActivationScreen';
-import { DepositListScreen } from './layout/screens/User/DepositListScreen';
-import { DepositPayScreen } from './layout/screens/User/DepositPayScreen';
 
-// teem
-import { TeamScreen } from './layout/screens/User/Team/TeamScreen';
-
-import { WalletScreen } from './layout/screens/User/WalletScreen';
-import { WithdrawalScreen } from './layout/screens/User/WithdrawalScreen';
-import { EarningScreen } from './layout/screens/User/EarningScreen';
-
-// support
-import { SupportScreen } from './layout/screens/User/Support/SupportScreen';
-
-// order
-import { OrderScreen } from './layout/screens/User/Order/OrderScreen';
-
-import { ProductsScreen } from './layout/screens/User/Products';
-import { KycScreen } from './layout/screens/User/Kyc';
-
- 
 
 const Stack = createStackNavigator(); 
 
@@ -65,7 +44,7 @@ function App() {
            headerShown: false,
            animation: 'slide_from_right',
            }}
-        initialRouteName="Login">
+        initialRouteName={initialRoute2}>
        
         {/* Auth Screens */}
         <Stack.Screen name="Login">
@@ -134,86 +113,9 @@ function App() {
             </FooterSidebarScreen>
           )}
         </Stack.Screen>
-        <Stack.Screen name="NewRegister">
-          {props => (
-            <NormalScreen {...props}> 
-              <NewRegisterScreen {...props} />
-            </NormalScreen>
-          )}
-        </Stack.Screen>
-        <Stack.Screen name="AccountActivation">
-          {props => (
-            <NormalScreen {...props}> 
-              <AccountActivationScreen {...props} />
-            </NormalScreen>
-          )}
-        </Stack.Screen>
-        <Stack.Screen name="DepositList">
-          {props => (
-            <NormalScreen {...props}> 
-              <DepositListScreen {...props} />
-            </NormalScreen>
-          )}
-        </Stack.Screen>
-        <Stack.Screen name="DepositPay">
-          {props => (
-            <NormalScreen {...props}> 
-              <DepositPayScreen {...props} />
-            </NormalScreen>
-          )}
-        </Stack.Screen>
         
-        <Stack.Screen name="Team">
-          {props => (
-            <NormalScreen {...props}> 
-              <TeamScreen {...props} />
-            </NormalScreen>
-          )}
-        </Stack.Screen>
-
-        <Stack.Screen name="Wallet">
-          {props => (
-            <NormalScreen {...props}> 
-              <WalletScreen {...props} />
-            </NormalScreen>
-          )}
-        </Stack.Screen>
-
-        <Stack.Screen name="Withdrawal">
-          {props => (
-            <NormalScreen {...props}> 
-              <WithdrawalScreen {...props} />
-            </NormalScreen>
-          )}
-        </Stack.Screen>
-
-        <Stack.Screen name="Earning">
-          {props => (
-            <NormalScreen {...props}> 
-              <EarningScreen {...props} />
-            </NormalScreen>
-          )}
-        </Stack.Screen>
-
-        <Stack.Screen name="Support">
-          {props => (
-            <NormalScreen {...props}> 
-              <SupportScreen {...props} />
-            </NormalScreen>
-          )}
-        </Stack.Screen>
-
-        <Stack.Screen name="Order">
-          {props => (
-            <NormalScreen {...props}> 
-              <OrderScreen {...props} />
-            </NormalScreen>
-          )}
-        </Stack.Screen>
-
         
-        <Stack.Screen name="Products" component={ProductsScreen} />        
-        <Stack.Screen name="Kyc" component={KycScreen} />        
+            
 
 
 
